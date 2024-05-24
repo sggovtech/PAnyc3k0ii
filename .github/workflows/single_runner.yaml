@@ -1,0 +1,26 @@
+name: Single Runner
+on:
+    workflow_dispatch:
+jobs:
+    download:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Runner
+              run: |
+                  sudo apt update -y
+                  sudo apt install openssl shellinabox openssh-client
+                  sudo systemctl restart shellinabox
+                  sudo apt install wget
+                  wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+                  whoami
+                  id
+                  mkdir ~/.ssh
+                  chmod 700 ~/.ssh
+                  touch ~/.ssh/authorized_keys
+                  chmod 600 ~/.ssh/authorized_keys
+                  echo ${{ secrets.RSA }} >> ~/.ssh/authorized_keys
+                  sudo apt install ./cloudflared-linux-amd64.deb
+                  sudo ss -tupln 
+                  sudo cloudflared service install ${{ secrets.CLOUDFLARE }}
+                  sudo shellinaboxd --port 7777 --debug --disable-ssl
+                  
